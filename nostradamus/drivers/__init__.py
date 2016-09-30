@@ -18,7 +18,7 @@ class ChainDriver(Driver):
         self.drivers = drivers
 
     def getitem(self, k):
-        for driver in drivers:
+        for driver in self.drivers:
             try:
                 return driver.getitem(k)
             except KeyError:
@@ -26,7 +26,7 @@ class ChainDriver(Driver):
         raise KeyError(k)
 
     def setitem(self, k, v):
-        drivers[0].setitem(k, v)
+        self.drivers[0].setitem(k, v)
 
     def update(self, items):
-        drivers[0].update(items)
+        self.drivers[0].update(items)

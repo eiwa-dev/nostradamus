@@ -92,6 +92,9 @@ class Serializable(metaclass=WithListMeta):
         """
         pass
 
+Serializable.register(RefList)
+Serializable.register(List)
+
 class Referenceable(Serializable):
     """Base class for objects which are not contained inside other objects, but
     instead can be referred to by name. Each name must be unique within each section.
@@ -138,6 +141,13 @@ class Referenceable(Serializable):
 class ConsistencyError(Exception):
     """Raised whenever one tries to serialize two different objects with
     the same name."""
+    pass
+
+class ParseError(Exception):
+    pass
+
+class ObjectNotFound(Exception):
+    #TODO: Use this.
     pass
 
 class Database:
