@@ -2,10 +2,11 @@
 This is NOT an ODM.
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, ABCMeta
 import collections
 import uuid
 import functools
+from .drivers import Driver
 
 __author__ = [  "Juan Carrano <jc@eiwa.ag>", "Federico M. Pomar <fp@eiwa.ag>"
              ]
@@ -104,6 +105,7 @@ class Referenceable(Serializable):
     Notes:
         from_dict must not take any kwargs, as deserialization of an independent object
             cannot depend on the context.
+        from_dict must take the objects name as an argument following read_func.
     """
     _ElementListBase = RefList
 
@@ -115,11 +117,11 @@ class Referenceable(Serializable):
     @abstractmethod
     def SECTION(self):
         pass
-    
+
     @classmethod
     def from_ref(cls, d, read_func):
         """Lookup the object using read_func and the name specified in d."""
-        return read_func(cls, d['target_name'])
+        return read_func((cls, d['target_name']))
 
     def as_ref(self, write_func):
         """Dump the object with write_func and return a dictionary representing the
@@ -132,26 +134,6 @@ class Referenceable(Serializable):
     def generate_name(cls):
         return cls.__name__ + str(uuid.uuid1())
 
-        
-class Driver(ABC):
-    @abstractmethod
-    def getitem(self, k):
-        pass
-
-    @abstractmethod
-    def setitem(self, k, v):
-        pass
-
-    def update(self, items):
-        for k, v in items:
-            self.setitem(k, v)
-        
-
-class MongoDriver(object):
-    pass
-
-class DictionaryDriver(object):
-    pass
 
 class ConsistencyError(Exception):
     """Raised whenever one tries to serialize two different objects with
@@ -200,7 +182,8 @@ class Database:
         if (cls, name) not in read_cache:
             d = self._driver.getitem((cls.SECTION, name))
             read_cache[(cls, name)] = cls.from_dict(d,
-                                        functools.partial(self.read, read_cache = read_cache))
+                                        functools.partial(self.read, read_cache = read_cache),
+                                        name = name)
         
         return read_cache[(cls, name)]
 
