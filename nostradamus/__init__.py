@@ -19,7 +19,7 @@ class WithListMeta(ABCMeta):
         super().__init__(*args, **kwargs)
         class _ElementList(self._ElementListBase):
             ELEMENT_CLASS = self
-        self.ElementList = _ElementList
+        self.List = _ElementList
 
 class RefList(collections.UserList):
     LIST_KEY = 'contents'
@@ -45,7 +45,7 @@ class RefList(collections.UserList):
 
 class List(collections.UserList):
     LIST_KEY = 'contents'
-
+    
     @property
     @abstractmethod
     def ELEMENT_CLASS(self):
