@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 setup(name='nostradamus',
-      version='0.1',
+      version='0.2',
       description='Not An Object-document-mapper',
       long_description=readme(),
       classifiers=[
