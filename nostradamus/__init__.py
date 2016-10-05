@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod, ABCMeta
 import collections
 import uuid
 import functools
-from .drivers import Driver
 
-__author__ = [  "Juan Carrano <jc@eiwa.ag>", "Federico M. Pomar <fp@eiwa.ag>"
+__author__ = [  "Juan Carrano <jc@eiwa.ag>",
+                "Federico M. Pomar <fp@eiwa.ag>"
              ]
 __copyright__ = "Copyright 2016 EIWA S.A. All rights reserved."
 __license__ = """Unauthorized copying of this file, via any medium is
@@ -32,20 +32,20 @@ class RefList(collections.UserList):
     @classmethod
     def from_dict(cls, d, read_func = None, **kwargs):
         contents_d = d[cls.LIST_KEY]
-        
-        contents = [cls.ELEMENT_CLASS.from_ref(element_d, read_func) 
+
+        contents = [cls.ELEMENT_CLASS.from_ref(element_d, read_func)
                     for element_d in contents_d]
 
         return cls(contents, **kwargs)
 
     def as_dict(self, write_func):
         contents_d = [element.as_ref(write_func) for element in self]
-        
+
         return {self.LIST_KEY: contents_d}
 
 class List(collections.UserList):
     LIST_KEY = 'contents'
-    
+
     @property
     @abstractmethod
     def ELEMENT_CLASS(self):
@@ -54,15 +54,15 @@ class List(collections.UserList):
     @classmethod
     def from_dict(cls, d, read_func = None, **kwargs):
         contents_d = d[cls.LIST_KEY]
-        
-        contents = [cls.REFERENCE_CLASS.from_dict(element_d, read_func) 
+
+        contents = [cls.REFERENCE_CLASS.from_dict(element_d, read_func)
                     for element_d in contents_d]
 
         return cls(contents, **kwargs)
 
     def as_dict(self, write_func):
         contents_d = [element.as_dict(write_func) for element in self]
-        
+
         return {self.LIST_KEY: contents_d}
 
 class Serializable(metaclass=WithListMeta):
@@ -88,7 +88,7 @@ class Serializable(metaclass=WithListMeta):
     @abstractmethod
     def as_dict(self, write_func = None):
         """Create a dictionary from an object.
-        :return: 
+        :return:
         """
         pass
 
@@ -130,12 +130,12 @@ class Referenceable(Serializable):
         """Dump the object with write_func and return a dictionary representing the
         reference."""
         write_func(self)
-        return {'_IS_REFERENCE': True, 
+        return {'_IS_REFERENCE': True,
                 'target_name': self.name}
 
     @classmethod
     def generate_name(cls):
-        return cls.__name__ + str(uuid.uuid1())
+        return "{}-{}".format(cls.__name__, uuid.uuid1())
 
 
 class ConsistencyError(Exception):
@@ -177,7 +177,7 @@ class Database:
             write_cache = {}
 
         self._write(obj, write_cache)
-        self._driver.update((key, d) for key, (obj, d) in write_cache.items())        
+        self._driver.update((key, d) for key, (obj, d) in write_cache.items())
 
     def read(self, cls_name, read_cache = None):
         """Read an object from a section. Multiple read() calls will yield different
@@ -194,7 +194,7 @@ class Database:
             read_cache[(cls, name)] = cls.from_dict(d,
                                         functools.partial(self.read, read_cache = read_cache),
                                         name = name)
-        
+
         return read_cache[(cls, name)]
 
     def read_many(self, cls_names):
@@ -211,9 +211,4 @@ class Database:
         for obj in objs:
             self._write(obj, write_cache = write_cache)
 
-        self._driver.update((key, d) for key, (obj, d) in write_cache.items())        
-        
-
-
-
-
+        self._driver.update((key, d) for key, (obj, d) in write_cache.items())
