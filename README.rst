@@ -1,3 +1,3 @@
 ====================================
-Nostradamus is NOT an ODM (but quite close
+Nostradamus is NOT an ODM (but quite close)
 ====================================
