@@ -1,13 +1,35 @@
-from . import Driver
+"""MongoDB backend"""
+
+import posixpath
+
 from pymongo import MongoClient
 
-class MongoDriver(Driver):
+from .base import UriDriver
+
+__author__ = [  "Juan Carrano <jc@eiwa.ag>",
+                "Federico M. Pomar <fp@eiwa.ag>"
+             ]
+__copyright__ = "Copyright 2016 EIWA S.A. All rights reserved."
+__license__ = """Unauthorized copying of this file, via any medium is
+                 strictly prohibited. Proprietary and confidential"""
+
+class MongoDriver(UriDriver):
+    URI_SCHEMES = ["mongo"]
+
     @classmethod
-    def from_uri(cls, uri, db_name):
-        return cls(MongoClient(uri)[db_name])
+    def from_uri(cls, uri):
+        if not posixpath.basename(uri.path):
+            raise ValueError("The connection uri must specify the database name")
+
+        dbname = uri.path[1:]
+
+        return cls(MongoClient(str(uri))[dbname])
 
     def __init__(self, db):
         self.db = db
+
+    def __repr__(self):
+        return "{}({!r})".format(type(self).__name__, self.db)
 
     def getitem(self, k):
         section, name = k
@@ -16,7 +38,7 @@ class MongoDriver(Driver):
         if item is None:
             raise KeyError(k)
         return item
-    
+
     def setitem(self, k, v):
         section, name = k
         item = dict(v)
