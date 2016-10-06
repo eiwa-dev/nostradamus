@@ -14,7 +14,7 @@ __license__ = """Unauthorized copying of this file, via any medium is
                  strictly prohibited. Proprietary and confidential"""
 
 class MongoDriver(UriDriver):
-    URI_SCHEMES = ["mongo"]
+    URI_SCHEMES = ["mongodb"]
 
     @classmethod
     def from_uri(cls, uri):
@@ -23,7 +23,7 @@ class MongoDriver(UriDriver):
 
         dbname = uri.path[1:]
 
-        return cls(MongoClient(str(uri))[dbname])
+        return cls(MongoClient(uri.geturl())[dbname])
 
     def __init__(self, db):
         self.db = db
@@ -35,6 +35,7 @@ class MongoDriver(UriDriver):
         section, name = k
         item = dict(self.db[section].find_one({'__ref_name__': name}))
         del item['__ref_name__']
+        del item['_id']
         if item is None:
             raise KeyError(k)
         return item
