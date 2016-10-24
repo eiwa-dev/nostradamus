@@ -15,4 +15,4 @@ pipelines:
           - echo >> ~/.ssh/id_rsa
           - cat ~/.ssh/id_rsa
           - chmod 600 ~/.ssh/id_rsa
-          - git push -u $OTHER_REPO master
+          - git push -uf $OTHER_REPO master
