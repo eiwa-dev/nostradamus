@@ -214,3 +214,7 @@ class Database:
             self._write(obj, write_cache = write_cache)
 
         self._driver.update((key, d) for key, (obj, d) in write_cache.items())
+
+    def query_names(self, cls, query=None):
+        return self._driver.query_names(cls.SECTION, query)
+        

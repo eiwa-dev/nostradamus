@@ -45,3 +45,7 @@ class MongoDriver(UriDriver):
         item = dict(v)
         item['__ref_name__'] = name
         self.db[section].replace_one({'__ref_name__': name}, item, upsert=True)
+
+    def query_names(self, section, query=None):
+        cursor = self.db[section].find(filter=query, projection=['__ref_name__'])
+        return (obj['__ref_name__'] for obj in cursor)

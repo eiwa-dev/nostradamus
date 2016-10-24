@@ -26,6 +26,21 @@ class DictionaryDriver(Driver):
         section = self.d.setdefault(section_name, {})
         section[name] = v
 
+    def query_names(self, query_section_name, query=None):
+        section = self.d.setdefault(query_section_name, {})
+        return [name for name, obj in section.items()
+                        if self._dict_match(obj, query)]
+                
+    def _dict_match(self, obj, query=None):
+        for k, v in query.items():
+            k_fields = k.split('.')
+            o_value = obj
+            for field in k_fields:
+                o_value = o_value[field]
+            if o_value != v:
+                return False
+        return True
+            
 class ChainDriver(UriDriver):
     URI_SCHEMES = ['chain']
 
@@ -35,9 +50,7 @@ class ChainDriver(UriDriver):
     @classmethod
     def from_uri(cls, uri):
         sub_driver_uris = [unquote(s) for s in uri.path.split("/") if s]
-
         sub_drivers = [new_driver(u) for u in sub_driver_uris]
-
         return cls(sub_drivers)
 
     def __repr__(self):
@@ -57,3 +70,6 @@ class ChainDriver(UriDriver):
     def update(self, items):
         self.drivers[0].update(items)
 
+    def query_names(self, cls, query=None):
+        return set([name for driver in self.drivers
+                             for name in driver.query_names(cls, query)])
