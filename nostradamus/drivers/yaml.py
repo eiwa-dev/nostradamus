@@ -35,11 +35,11 @@ class YAMLDriver(UriDriver):
 
     def _reload(self):
         self._file.seek(0)
-        d = yaml.load(self._file)
+        d = yaml.safe_load(self._file)
         self._dictd = DictionaryDriver(d)
 
     def _dump(self):
-        s = yaml.dump(self._dictd.d)
+        s = yaml.safe_dump(self._dictd.d)
         # truncate the file only after the dump succeeded
         self._file.seek(0)
         self._file.truncate(0)

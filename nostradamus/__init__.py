@@ -61,7 +61,7 @@ class List(collections.UserList):
         return cls(contents, **kwargs)
 
     def as_dict(self, write_func):
-        contents_d = [element.as_dict(write_func) for element in self]
+        contents_d = [element.as_dict(write_func=write_func) for element in self]
 
         return {self.LIST_KEY: contents_d}
 
@@ -156,7 +156,7 @@ class Database:
 
     def _write(self, obj, write_cache):
         if (obj.SECTION, obj.name) not in write_cache:
-            d = obj.as_dict(functools.partial(self._write, write_cache = write_cache))
+            d = obj.as_dict(write_func=functools.partial(self._write, write_cache = write_cache))
             write_cache[(obj.SECTION, obj.name)] = (obj, d)
         else:
             c_obj, c_d = write_cache[(obj.SECTION, obj.name)]
