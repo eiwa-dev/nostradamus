@@ -154,16 +154,17 @@ class Database:
     def __init__(self, driver):
         self._driver = driver
 
-    def _write(self, obj, write_cache):
+    def _write(self, obj, write_cache, follow_refs=True):
         if (obj.SECTION, obj.name) not in write_cache:
-            d = obj.as_dict(write_func=functools.partial(self._write, write_cache = write_cache))
+            write_func = self._write if follow_refs else (lambda *args, **kwargs: None)
+            d = obj.as_dict(functools.partial(write_func, write_cache = write_cache))
             write_cache[(obj.SECTION, obj.name)] = (obj, d)
         else:
             c_obj, c_d = write_cache[(obj.SECTION, obj.name)]
             if c_obj != obj:
                 raise ConsistencyError("Tried to serialize different objects with the same name")
 
-    def write(self, obj, write_cache = None):
+    def write(self, obj, write_cache = None, follow_refs=True):
         """Write an object and all directly or indirectly referenced objects.
         Consistency (one name corresponds to only one object) is checked before
         committing to the database.
@@ -171,12 +172,13 @@ class Database:
         In this respect, calling write() multiple times on the same Database instance
         is the same as calling write on different instances tied to the same backend.
         If you want to write multiple object in one operation, use write_many.
+        If you do not want to write referenced objects, set follow_refs=False. Use with caution.
         """
 
         if write_cache is None:
             write_cache = {}
 
-        self._write(obj, write_cache)
+        self._write(obj, write_cache, follow_refs=follow_refs)
         self._driver.update((key, d) for key, (obj, d) in write_cache.items())
 
     def read(self, cls_name, read_cache = None):
@@ -212,3 +214,7 @@ class Database:
             self._write(obj, write_cache = write_cache)
 
         self._driver.update((key, d) for key, (obj, d) in write_cache.items())
+
+    def query_names(self, cls, query=None):
+        return self._driver.query_names(cls.SECTION, query)
+        

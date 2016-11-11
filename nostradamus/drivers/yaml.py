@@ -55,3 +55,6 @@ class YAMLDriver(UriDriver):
     def update(self, items):
         self._dictd.update(items)
         self._dump()
+
+    def query_names(self, section, query=None):
+        return self._dictd.query_names(section, query)
