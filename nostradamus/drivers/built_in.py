@@ -37,7 +37,10 @@ class DictionaryDriver(Driver):
             k_fields = k.split('.')
             o_value = obj
             for field in k_fields:
-                o_value = o_value[field]
+                try:
+                    o_value = o_value[field]
+                except KeyError:
+                    return False
             if o_value != v:
                 return False
         return True
