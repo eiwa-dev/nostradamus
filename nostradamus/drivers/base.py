@@ -21,6 +21,10 @@ class Driver(ABC):
     def setitem(self, k, v):
         pass
 
+    @abstractmethod
+    def query_names(self, query_section_name, query=None):
+        pass
+
     def update(self, items):
         for k, v in items:
             self.setitem(k, v)
