@@ -55,7 +55,7 @@ class List(collections.UserList):
     def from_dict(cls, d, read_func = None, **kwargs):
         contents_d = d[cls.LIST_KEY]
 
-        contents = [cls.REFERENCE_CLASS.from_dict(element_d, read_func)
+        contents = [cls.ELEMENT_CLASS.from_dict(element_d, read_func)
                     for element_d in contents_d]
 
         return cls(contents, **kwargs)
