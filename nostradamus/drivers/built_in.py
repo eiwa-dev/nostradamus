@@ -30,18 +30,22 @@ class DictionaryDriver(Driver):
         section = self.d.setdefault(query_section_name, {})
         return [name for name, obj in section.items()
                         if self._dict_match(obj, query)]
-                
-    def _dict_match(self, obj, query=None):
+
+    @staticmethod
+    def _dict_match(obj, query=None):
         query = {} if query is None else query
         for k, v in query.items():
             k_fields = k.split('.')
             o_value = obj
             for field in k_fields:
-                o_value = o_value[field]
+                try:
+                    o_value = o_value[field]
+                except KeyError:
+                    return False
             if o_value != v:
                 return False
         return True
-            
+
 class ChainDriver(UriDriver):
     URI_SCHEMES = ['chain']
 

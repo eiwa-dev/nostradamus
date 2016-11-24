@@ -61,7 +61,7 @@ class List(collections.UserList):
         return cls(contents, **kwargs)
 
     def as_dict(self, write_func):
-        contents_d = [element.as_dict(write_func) for element in self]
+        contents_d = [element.as_dict(write_func=write_func) for element in self]
 
         return {self.LIST_KEY: contents_d}
 

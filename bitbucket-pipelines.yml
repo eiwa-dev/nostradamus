@@ -1,18 +1,28 @@
 # Push to another repo.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-# image: python:3.5.1
+image: python:3.5.1
 
 pipelines:
-  default:
-    - step:
-        script:
-          - mkdir -p ~/.ssh
-          - echo $OTHER_REPO_FINGERPRINTS_b64 | base64 -d >> ~/.ssh/known_hosts
-          - echo >> ~/.ssh/known_hosts
-          - chmod 600 ~/.ssh/known_hosts
-          - echo $SSH_GIT_KEY_b64 | base64 -d > ~/.ssh/id_rsa
-          - echo >> ~/.ssh/id_rsa
-          - cat ~/.ssh/id_rsa
-          - chmod 600 ~/.ssh/id_rsa
-          - git push -uf $OTHER_REPO master
+  branches:
+    master:
+      - step:
+          script:
+            - echo "Upload package"
+            - pip install -U devpi-client
+            - PYPI_URL="https://$PYPI_SERVER_LOGIN@$PYPI_SERVER/"
+            - echo "${PYPI_URL}"
+            - devpi use "${PYPI_URL}"
+            - devpi login $DEVPI_USER --password "$DEVPI_PASS"
+            - devpi use $DEVPI_INDEX
+            - devpi upload --no-vcs
+            - echo "Push repo"
+            - mkdir -p ~/.ssh
+            - echo $OTHER_REPO_FINGERPRINTS_b64 | base64 -d >> ~/.ssh/known_hosts
+            - echo >> ~/.ssh/known_hosts
+            - chmod 600 ~/.ssh/known_hosts
+            - echo $SSH_GIT_KEY_b64 | base64 -d > ~/.ssh/id_rsa
+            - echo >> ~/.ssh/id_rsa
+            - cat ~/.ssh/id_rsa
+            - chmod 600 ~/.ssh/id_rsa
+            - git push -uf $OTHER_REPO master

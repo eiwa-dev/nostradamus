@@ -48,13 +48,13 @@ class YAMLDriver(UriDriver):
         file_checksum = self._file_checksum()
         if file_checksum != self._prev_file_checksum:
             self._file.seek(0)
-            d = yaml.load(self._file)
+            d = yaml.safe_load(self._file)
             self._dictd = DictionaryDriver(d)
             self._prev_file_checksum = file_checksum
             print('reloaded')
 
     def _dump(self):
-        s = yaml.dump(self._dictd.d)
+        s = yaml.safe_dump(self._dictd.d)
         # truncate the file only after the dump succeeded
         self._file.seek(0)
         self._file.truncate(0)
