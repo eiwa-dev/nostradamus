@@ -33,6 +33,7 @@ class DictionaryDriver(Driver):
 
     @staticmethod
     def _dict_match(obj, query=None):
+        query = {} if query is None else query
         for k, v in query.items():
             k_fields = k.split('.')
             o_value = obj
