@@ -218,3 +218,5 @@ class Database:
     def query_names(self, cls, query=None):
         return self._driver.query_names(cls.SECTION, query)
 
+    def query_elements(self, cls, projection, query=None):
+        return self._driver.query_elements(cls.SECTION, projection, query)

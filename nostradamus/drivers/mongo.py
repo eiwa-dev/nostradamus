@@ -50,3 +50,8 @@ class MongoDriver(UriDriver):
     def query_names(self, section, query=None):
         cursor = self.db[section].find(filter=query, projection=['__ref_name__'])
         return (obj['__ref_name__'] for obj in cursor)
+
+    def query_elements(self, section, projection, query=None):
+        cursor = self.db[section].find(filter=query, projection=projection)
+        return cursor
+
