@@ -33,11 +33,13 @@ class MongoDriver(UriDriver):
 
     def getitem(self, k):
         section, name = k
-        item = dict(self.db[section].find_one({'__ref_name__': name}))
+        fetch = self.db[section].find_one({'__ref_name__': name})
+        if fetch is None:
+            raise KeyError(k)
+        item = dict(fetch)
         del item['__ref_name__']
         del item['_id']
-        if item is None:
-            raise KeyError(k)
+
         return item
 
     def setitem(self, k, v):
