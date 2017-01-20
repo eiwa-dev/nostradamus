@@ -181,21 +181,18 @@ class Database:
         self._write(obj, write_cache, follow_refs=follow_refs)
         self._driver.update((key, d) for key, (obj, d) in write_cache.items())
 
-    def read(self, cls_name, read_cache = None):
+    def read(self, cls_name, read_cache={}):
         """Read an object from a section. Multiple read() calls will yield different
         objects for the same name. If you want to read many objects and get the same
         database object mapped to the same python object, use read_many().
         """
         cls, name = cls_name
 
-        if read_cache is None:
-            read_cache = {}
-
         if (cls, name) not in read_cache:
             d = self._driver.getitem((cls.SECTION, name))
             read_cache[(cls, name)] = cls.from_dict(d,
-                                        functools.partial(self.read, read_cache = read_cache),
-                                        name = name)
+                                        functools.partial(self.read, read_cache=read_cache),
+                                        name=name)
 
         return read_cache[(cls, name)]
 
@@ -211,7 +208,7 @@ class Database:
         write_cache = {}
 
         for obj in objs:
-            self._write(obj, write_cache = write_cache)
+            self._write(obj, write_cache=write_cache)
 
         self._driver.update((key, d) for key, (obj, d) in write_cache.items())
 
